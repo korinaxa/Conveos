@@ -6,5 +6,24 @@ body{
 
 .App {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 3%;
+}
+
+label {
+  font-size: 30px;
+}
+
+#label_series {
+  padding-left: 1%;
+}
+
+.all_objects {
+  margin-top: 3%;
+}
+
+.object_container {
+  padding:5%;
+  border:solid;
+  border-radius: 21px;
+ border-color: #363755;
 }
