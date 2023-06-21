@@ -49,7 +49,7 @@ const App: React.FC = () => {
   }
 
   const handleSortByRating = () => {
-    const sortedMovies = searchResults.sort((a, b) => a.imdbRating - b.imdbRating);
+    const sortedMovies = searchResults.sort((a, b) => b.imdbRating - a.imdbRating);
     setSearchResults(sortedMovies);
   }
   
@@ -73,27 +73,28 @@ const App: React.FC = () => {
       return;
     }
 
-    async function fetchMovieDetails() {
+    const fetchMovieData = async () => {
       try {
-        const firstResponse = await axios.get(`http://www.omdbapi.com/?apikey=9e3139c8&s=${selectedOption}&type=${selectedOption}`);    
-        setSearchResults(firstResponse.data.Search);
-        const necessaryData = firstResponse.data.Search;
+        const response = await axios.get(`http://www.omdbapi.com/?apikey=9e3139c8&s=${selectedOption}&type=${selectedOption}`);  
+        setSearchResults(response.data.Search);
 
-        searchResults.forEach(async (movie) => {
-          const secondResponse = await axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=9e3139c8`);
-          console.log(secondResponse.data.Title, "   ", secondResponse.data.imdbRating)
-          movie.imdbRating = secondResponse.data.imdbRating; 
-         // console.log(movie.imdbRating);
-         setSearchResults(secondResponse.data.Search);
-          return secondResponse.data;
+        const moviesWithoutRating: Movie[] = response.data.Search;
+        const promises = moviesWithoutRating.map(async (movie) => {
+          const ratingResponse = await await axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=9e3139c8`);
+          const imdbRating = ratingResponse.data.imdbRating;
+          return { ...movie, imdbRating };
         });
-      }
-      catch(error){
-        console.error(error);
-      }
-    }
 
-fetchMovieDetails();
+        const updatedMovies = await Promise.all(promises);
+        setSearchResults(updatedMovies);
+
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchMovieData();
+
   }, [selectedOption]);
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
