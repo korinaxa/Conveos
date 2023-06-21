@@ -8,17 +8,51 @@ interface Movie {
   imdbID: string;
   Type: string;
   Poster: string;
+  imdbRating: number;
 }
+
 
 const App: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<string>("movie");
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [searchValue, setSearchValue] = useState('');
+  const [sortOption, setSortOption] = useState('default');
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
 
+  const handleSortOptionChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSortOption(value);
+    switch (value) {
+      case 'year':
+        handleSortByYear();
+        break;
+      case 'rating':
+        handleSortByRating();
+        break;
+      default:
+        handleSortByTitle();
+        break;
+    }
+  };
+
+  const handleSortByTitle = () => {
+    const sortedMovies = [...searchResults].sort((a, b) => a.Title.localeCompare(b.Title));
+    setSearchResults(sortedMovies);
+  }
+
+  const handleSortByYear = () => {
+    const sortedMovies = searchResults.sort((a, b) => parseInt((a.Year).slice(0,4)) - parseInt((b.Year).slice(0,4)));
+    setSearchResults(sortedMovies);
+  }
+
+  const handleSortByRating = () => {
+    const sortedMovies = searchResults.sort((a, b) => a.imdbRating - b.imdbRating);
+    setSearchResults(sortedMovies);
+  }
+  
   const handleSearchSubmit = () => {
     axios
       .get(
@@ -33,21 +67,33 @@ const App: React.FC = () => {
   };
   
   useEffect(() => {
+
     if (selectedOption === "") {
       setSearchResults([]);
       return;
     }
 
-    axios
-      .get(
-        `http://www.omdbapi.com/?apikey=9e3139c8&s=${selectedOption}&type=${selectedOption}`
-      )
-      .then((response) => {
-        setSearchResults(response.data.Search);
-      })
-      .catch((error) => {
+    async function fetchMovieDetails() {
+      try {
+        const firstResponse = await axios.get(`http://www.omdbapi.com/?apikey=9e3139c8&s=${selectedOption}&type=${selectedOption}`);    
+        setSearchResults(firstResponse.data.Search);
+        const necessaryData = firstResponse.data.Search;
+
+        searchResults.forEach(async (movie) => {
+          const secondResponse = await axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=9e3139c8`);
+          console.log(secondResponse.data.Title, "   ", secondResponse.data.imdbRating)
+          movie.imdbRating = secondResponse.data.imdbRating; 
+         // console.log(movie.imdbRating);
+         setSearchResults(secondResponse.data.Search);
+          return secondResponse.data;
+        });
+      }
+      catch(error){
         console.error(error);
-      });
+      }
+    }
+
+fetchMovieDetails();
   }, [selectedOption]);
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,13 +111,21 @@ const App: React.FC = () => {
           <input type="radio" value="series" checked={selectedOption === "series"} onChange={handleOptionChange}/>
           Series
         </label>
+      </header>
 
-          <div  id="search_field">
+      <div id="sort_field">
+        <label id="label_sort">Sort by: </label>
+          <select value={sortOption} onChange={handleSortOptionChange}>
+            <option value="default">Title (A-Z)</option>
+            <option value="year">Year</option>
+            <option value="rating">Rating</option>
+          </select>
+        </div>
+
+        <div id="search_field">
           <input type="text" value={searchValue} onChange={handleSearchChange}></input>
           <button onClick={handleSearchSubmit}>Search</button>
-          </div>
-
-      </header>
+        </div>
       
       <div className="all_objects">
         {searchResults === undefined ? (<p>No results found.</p>) : (
@@ -80,6 +134,7 @@ const App: React.FC = () => {
           <div className="object_container" key={movie.imdbID}>
             <h3>{movie.Title}</h3>
             <p>Year: {movie.Year}</p>
+            <p>Rating: {movie.imdbRating}</p>
             <img src={movie.Poster} alt={movie.Title} />
           </div>
         ))}

@@ -9,22 +9,34 @@ body{
   margin-top: 3%;
 }
 
+ul {
+  padding: 0%;
+}
+
 label {
   font-size: 30px;
 }
 
+#label_sort {
+  font-size: 16px;
+}
+
+#sort_field {
+  float: left;
+  margin-left: 1%;
+}
+
 #search_field {
-  position: absolute;
-  right: 10px;
+  float: right;
+  margin-right: 1%;
 }
 
 input {
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 button {
   border-radius: 5px;
-
 }
 
 #label_series {
