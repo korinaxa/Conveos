@@ -76,9 +76,10 @@ const App: React.FC = () => {
     const fetchMovieData = async () => {
       try {
         const response = await axios.get(`http://www.omdbapi.com/?apikey=9e3139c8&s=${selectedOption}&type=${selectedOption}`);  
-        setSearchResults(response.data.Search);
+        const sortedMovies = [...response.data.Search].sort((a, b) => a.Title.localeCompare(b.Title));
+        setSearchResults(sortedMovies);
 
-        const moviesWithoutRating: Movie[] = response.data.Search;
+        const moviesWithoutRating: Movie[] = sortedMovies;
         const promises = moviesWithoutRating.map(async (movie) => {
           const ratingResponse = await await axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=9e3139c8`);
           const imdbRating = ratingResponse.data.imdbRating;
