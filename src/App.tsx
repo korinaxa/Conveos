@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import './App.css';
 
+const apiKey = "9e3139c8";
+
 interface Movie {
   Title: string;
   Year: string;
@@ -52,18 +54,25 @@ const App: React.FC = () => {
     const sortedMovies = searchResults.sort((a, b) => b.imdbRating - a.imdbRating);
     setSearchResults(sortedMovies);
   }
-  
-  const handleSearchSubmit = () => {
-    axios
-      .get(
-        `http://www.omdbapi.com/?apikey=9e3139c8&s=${searchValue}&type=${selectedOption}`
-      )
-      .then((response) => {
-        setSearchResults(response.data.Search);
-      })
-      .catch((error) => {
-        console.error(error);
+
+  const handleSearchSubmit = async () => {
+    try {
+      const response = await axios.get(`http://www.omdbapi.com/?apikey=${apiKey}&s=${searchValue}&type=${selectedOption}`);  
+      setSearchResults(response.data.Search);
+
+      const moviesWithoutRating: Movie[] = response.data.Search;
+      const promises = moviesWithoutRating.map(async (movie) => {
+        const ratingResponse = await await axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=${apiKey}`);
+        const imdbRating = ratingResponse.data.imdbRating;
+        return { ...movie, imdbRating };
       });
+
+      const updatedMovies = await Promise.all(promises);
+      setSearchResults(updatedMovies);
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
   
   useEffect(() => {
@@ -75,13 +84,13 @@ const App: React.FC = () => {
 
     const fetchMovieData = async () => {
       try {
-        const response = await axios.get(`http://www.omdbapi.com/?apikey=9e3139c8&s=${selectedOption}&type=${selectedOption}`);  
+        const response = await axios.get(`http://www.omdbapi.com/?apikey=${apiKey}&s=${selectedOption}&type=${selectedOption}`);  
         const sortedMovies = [...response.data.Search].sort((a, b) => a.Title.localeCompare(b.Title));
         setSearchResults(sortedMovies);
 
         const moviesWithoutRating: Movie[] = sortedMovies;
         const promises = moviesWithoutRating.map(async (movie) => {
-          const ratingResponse = await await axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=9e3139c8`);
+          const ratingResponse = await await axios.get(`http://www.omdbapi.com/?i=${movie.imdbID}&apikey=${apiKey}`);
           const imdbRating = ratingResponse.data.imdbRating;
           return { ...movie, imdbRating };
         });
