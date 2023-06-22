@@ -13,6 +13,7 @@ interface MovieDetails {
   Type: string;
   Runtime: string;
   Released: string;
+  BoxOffice: string;
   Actors: string;
   Awards: string;
   Country: string;
@@ -26,18 +27,25 @@ interface MovieDetails {
   Genre: string;
 }
 
+interface Ratings {
+  Source: string;
+  Value: string;
+}
+
 
 function DetailedPage() {
   
 const { Title } = useParams<{ Title: string }>();
 const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
+const [movieRatings, setRatings] = useState<Ratings[]>([]);
 
 useEffect(() => {
   const fetchMovieDetails = async () => {
     try {
       const response = await axios.get(`http://www.omdbapi.com/?t=${Title}&apikey=${apiKey}`);
       setMovieDetails(response.data);
-      console.log(response.data);
+      setRatings(response.data.Ratings);
+      //console.log(response.data);
     } catch (error) {
       console.error('Error fetching movie details:', error);
     }
@@ -60,12 +68,23 @@ return (
         <p><span>Plot: </span>{movieDetails.Plot}</p>
         <p><span>Actors: </span>{movieDetails.Actors}</p>
         <p><span>Awards: </span>{movieDetails.Awards}</p>
+        <p><span>BoxOffice: </span>{movieDetails.BoxOffice}</p>  
         <p><span>Country: </span>{movieDetails.Country}</p>
         <p><span>Runtime: </span>{movieDetails.Runtime}</p>
         <p><span>Writer: </span>{movieDetails.Writer}</p>
         <p><span>Director: </span>{movieDetails.Director}</p>
         <p><span>Language: </span>{movieDetails.Language}</p>       
         <p><span>DVD: </span>{movieDetails.DVD}</p>
+        <span>Ratings</span>
+        {movieRatings === null ? (<p>No ratings..</p>) : (
+          <div>
+        {movieRatings.map((rating) => (
+          <div>
+          <p><span>Source: </span>{rating.Source} &emsp;&emsp; <span>Value: </span>{rating.Value}</p>
+          </div>
+        ))}
+        </div>
+        )}
       </div>
       <div id="second_child" className="flex-child">
         <img src={movieDetails.Poster} alt={movieDetails.Title} />
