@@ -53,3 +53,37 @@ button {
   border-radius: 21px;
   border-color: #363755;
 }
+
+.flex-container {
+  display: flex;
+  padding-top: 5%;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.flex-child {
+  flex: 1;
+  padding:2%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}  
+
+#second_child{
+  margin-right: 20px;
+  text-align: center;
+} 
+
+.links {
+  color:white;
+  font-size: 30px;
+}
+
+#title_text {
+  
+  text-align: center;
+  font-size: 30px;
+}
+
+span {
+  font-weight: bolder;
+  color:blanchedalmond;
+}

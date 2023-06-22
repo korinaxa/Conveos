@@ -144,7 +144,7 @@ const FirstPage: React.FC = () => {
           <ul>
         {searchResults.map((movie) => (
           <div className="object_container" key={movie.imdbID}>
-            <Link to={`/movie/${movie.Title}`}>{movie.Title}</Link>
+            <Link className="links" to={`/movie/${movie.Title}`}>{movie.Title}</Link>
             <p>Year: {movie.Year}</p>
             <p>Rating: {movie.imdbRating}</p>
             <img src={movie.Poster} alt={movie.Title} />

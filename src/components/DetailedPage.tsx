@@ -21,6 +21,9 @@ interface MovieDetails {
   Writer: string;
   Poster: string;
   imdbRating: number;
+  Director: string;
+  Language: string;
+  Genre: string;
 }
 
 
@@ -45,17 +48,31 @@ useEffect(() => {
 
 return (
   <div>
+    <Link className="links" to="/">Go back</Link>
     {movieDetails === null ? (<p>No results found.</p>) : (
-        <ul>
-          <div className="object_container">
-            <h3>Title: {movieDetails.Title}</h3>
-            <p>Year: {movieDetails.Year}</p>
-            <p>Rating: {movieDetails.imdbRating}</p>
-            <img src={movieDetails.Poster} alt={movieDetails.Title} />
-          </div>
-        </ul>
-      )}
-      <Link to="/">Go back</Link>
+    <div className="flex-container">
+      <div className="flex-child">
+        <div id="title_text"><span>{movieDetails.Title}</span></div>
+        <p><span>Released: </span>{movieDetails.Released}</p>
+        <p><span>Year: </span>{movieDetails.Year}</p>
+        <p><span>Type: </span>{movieDetails.Type}</p>
+        <p><span>Genre: </span>{movieDetails.Genre}</p>
+        <p><span>Plot: </span>{movieDetails.Plot}</p>
+        <p><span>Actors: </span>{movieDetails.Actors}</p>
+        <p><span>Awards: </span>{movieDetails.Awards}</p>
+        <p><span>Country: </span>{movieDetails.Country}</p>
+        <p><span>Runtime: </span>{movieDetails.Runtime}</p>
+        <p><span>Writer: </span>{movieDetails.Writer}</p>
+        <p><span>Director: </span>{movieDetails.Director}</p>
+        <p><span>Language: </span>{movieDetails.Language}</p>       
+        <p><span>DVD: </span>{movieDetails.DVD}</p>
+      </div>
+      <div id="second_child" className="flex-child">
+        <img src={movieDetails.Poster} alt={movieDetails.Title} />
+        <p>Rating: {movieDetails.imdbRating}</p>
+      </div>
+    </div>
+    )}
   </div>
 );
 }
